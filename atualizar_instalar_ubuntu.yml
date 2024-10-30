@@ -1,0 +1,28 @@
+---
+- name: Atualizar e configurar servidores Ubuntu
+  hosts: ubuntu_servers  # Certifique-se de que esse grupo está definido no inventário
+  become: yes            # Escalona privilégios para root
+  tasks:
+    - name: Atualizar lista de pacotes e pacotes instalados
+      ansible.builtin.apt:
+        update_cache: yes
+        upgrade: dist
+      register: update_result
+
+    - name: Instalar pacotes adicionais
+      ansible.builtin.apt:
+        name:
+          - open-vm-tools
+          - nano
+          - vim
+          - wget
+          - curl
+          - tcpdump
+          - net-tools
+        state: present
+        update_cache: yes
+
+    - name: Reiniciar servidores se necessário
+      ansible.builtin.reboot:
+        msg: "Reinicialização após atualização"
+      when: update_result.changed
