@@ -1,0 +1,15 @@
+---
+- name: Atualizar servidores proxy CentOS
+  hosts: proxys_servers  # Defina o grupo de hosts no seu inventário
+  become: yes             # Escalona privilégios para root
+  tasks:
+    - name: Atualizar lista de pacotes
+      ansible.builtin.yum:
+        name: "*"
+        state: latest
+      register: update_result
+
+    - name: Reiniciar servidores caso necessário
+      ansible.builtin.reboot:
+        msg: "Reinicialização após atualização"
+      when: update_result.changed
