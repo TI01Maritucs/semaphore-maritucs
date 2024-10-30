@@ -22,7 +22,7 @@
         state: present
         update_cache: yes
 
-    - name: Reiniciar servidores se necessário
-      ansible.builtin.reboot:
-        msg: "Reinicialização após atualização"
+    - name: Agendar reinicialização para daqui a 10 minutos, se necessário
+      ansible.builtin.command:
+        cmd: "shutdown -r +10 'Reinicialização agendada para atualização do sistema'"
       when: update_result.changed
