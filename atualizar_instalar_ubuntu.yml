@@ -1,13 +1,16 @@
 ---
-- name: Atualizar e configurar servidores Ubuntu
+- name: Atualizar e configurar servidores Ubuntu/Debian
   hosts: ubuntu_servers  # Certifique-se de que esse grupo está definido no inventário
   become: yes            # Escalona privilégios para root
   tasks:
-    - name: Atualizar lista de pacotes e pacotes instalados
+    - name: Atualizar lista de pacotes
       ansible.builtin.apt:
         update_cache: yes
+
+    - name: Executar dist-upgrade para pacotes instalados
+      ansible.builtin.apt:
         upgrade: dist
-      register: update_result
+      register: upgrade_result
 
     - name: Instalar pacotes adicionais
       ansible.builtin.apt:
@@ -25,4 +28,4 @@
     - name: Agendar reinicialização para daqui a 10 minutos, se necessário
       ansible.builtin.command:
         cmd: "shutdown -r +10 'Reinicialização agendada para atualização do sistema'"
-      when: update_result.changed
+      when: upgrade_result.changed
