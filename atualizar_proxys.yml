@@ -1,8 +1,22 @@
 ---
-- name: Atualizar servidores proxy CentOS
+- name: Atualizar servidores proxy CentOS e instalar pacotes adicionais
   hosts: proxys_servers  # Defina o grupo de hosts no seu inventário
   become: yes             # Escalona privilégios para root
   tasks:
+
+    - name: Instalar pacotes adicionais
+      ansible.builtin.yum:
+        name:
+          - open-vm-tools   # Pacote para VMware Tools no CentOS
+          - nano
+          - vim
+          - wget
+          - curl
+          - tcpdump
+          - net-tools
+        state: present
+      register: package_install
+      
     - name: Atualizar lista de pacotes
       ansible.builtin.yum:
         name: "*"
@@ -11,5 +25,5 @@
 
     - name: Reiniciar servidores caso necessário
       ansible.builtin.reboot:
-        msg: "Reinicialização após atualização"
-      when: update_result.changed
+        msg: "Reinicialização após atualização e instalação de pacotes adicionais"
+      when: update_result.changed or package_install.changed
